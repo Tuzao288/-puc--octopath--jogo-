@@ -1,5 +1,9 @@
+using System.Reflection;
+using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -7,7 +11,10 @@ public class PlayerController : MonoBehaviour
     private Rigidbody rb;
     private Vector2 moveInput;
     private Vector2 mouseInput;
-    [SerializeField] private float moveSpeed;
+    private GameObject score;
+    //private GameObject powerUp;
+    [SerializeField] private int takePoints;
+    public float moveSpeed;
     [SerializeField] private float rotationSpeed;
     [SerializeField] private Camera cam;
 
@@ -31,6 +38,8 @@ public class PlayerController : MonoBehaviour
     //No Start a gnt deixa só o "ActionMap" do player ativo por enquanto igual é pedido no aviso do InputPlayer
     private void Start()
     {
+        score = GameObject.FindGameObjectWithTag("Canvas");
+        //powerUp = GameObject.FindGameObjectWithTag("PowerUp");
         playerInput.actions.FindActionMap("Player").Enable();
         playerInput.actions.FindActionMap("UI").Disable();
     }
@@ -53,6 +62,17 @@ public class PlayerController : MonoBehaviour
             {
                 Quaternion lookTo = Quaternion.LookRotation(direction);// A direção em q o player vai olhar é atribuído a essa variável lookTo
                 rb.rotation = Quaternion.Slerp(rb.rotation, lookTo, rotationSpeed);//Faz a interpolação entre a rotação inicial do player com a direção q ele vai girar e velocidade da rotação
+            }
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            if (score.GetComponent<ScoreScript>().score >= 50)
+            {
+                score.GetComponent<ScoreScript>().ScoreDown(takePoints);
             }
         }
     }
